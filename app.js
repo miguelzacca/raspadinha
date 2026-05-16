@@ -343,7 +343,8 @@ document.addEventListener('DOMContentLoaded', () => {
         
         setTimeout(() => { canvas.style.display = 'none'; }, 500);
 
-        loadingIcon.classList.add('hidden');
+        const currentLoadingIcon = document.getElementById('loading-icon');
+        if (currentLoadingIcon) currentLoadingIcon.classList.add('hidden');
         resultTexts.classList.remove('hidden');
 
         if (scratchResult && scratchResult.win) {

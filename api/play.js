@@ -4,7 +4,7 @@ export default function handler(req, res) {
   }
 
   // Lógica de sorteio totalmente no backend
-  const chancesDeGanhar = 0.00; // 5% de chance de ganhar
+  const chancesDeGanhar = 0.05; // 5% de chance de ganhar
   const sorteio = Math.random();
 
   const isWinner = sorteio <= chancesDeGanhar;
