@@ -60,6 +60,66 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
+    // CPF Logic
+    const cpfInput = document.getElementById('cpf-input');
+    const btnValidateCpf = document.getElementById('btn-validate-cpf');
+    const cpfError = document.getElementById('cpf-error');
+
+    if (cpfInput) {
+        cpfInput.addEventListener('input', function (e) {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length > 11) value = value.slice(0, 11);
+            if (value.length > 9) {
+                value = value.replace(/(\d{3})(\d{3})(\d{3})(\d{1,2})/, "$1.$2.$3-$4");
+            } else if (value.length > 6) {
+                value = value.replace(/(\d{3})(\d{3})(\d{1,3})/, "$1.$2.$3");
+            } else if (value.length > 3) {
+                value = value.replace(/(\d{3})(\d{1,3})/, "$1.$2");
+            }
+            e.target.value = value;
+        });
+
+        btnValidateCpf.addEventListener('click', async () => {
+            const rawCpf = cpfInput.value.replace(/\D/g, '');
+            if (rawCpf.length !== 11) {
+                cpfError.innerText = "CPF inválido.";
+                cpfError.style.display = 'block';
+                return;
+            }
+
+            btnValidateCpf.innerHTML = `<span>Validando...</span><i data-lucide="loader-2" class="spin-icon"></i>`;
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+            btnValidateCpf.classList.add('loading');
+            cpfError.style.display = 'none';
+
+            try {
+                const res = await fetch('/api/verify-cpf', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ cpf: rawCpf })
+                });
+
+                const data = await res.json();
+                
+                if (res.ok && data.success) {
+                    finishQuiz();
+                } else {
+                    cpfError.innerText = data.error || "Você já resgatou sua chance grátis!";
+                    cpfError.style.display = 'block';
+                    btnValidateCpf.innerHTML = `<span>Validar & Ganhar</span><i data-lucide="check-circle"></i>`;
+                    if (typeof lucide !== 'undefined') lucide.createIcons();
+                    btnValidateCpf.classList.remove('loading');
+                }
+            } catch (err) {
+                cpfError.innerText = "Erro de conexão. Tente novamente.";
+                cpfError.style.display = 'block';
+                btnValidateCpf.innerHTML = `<span>Validar & Ganhar</span><i data-lucide="check-circle"></i>`;
+                if (typeof lucide !== 'undefined') lucide.createIcons();
+                btnValidateCpf.classList.remove('loading');
+            }
+        });
+    }
+
     function finishQuiz() {
         viewQuiz.classList.remove('active');
         setTimeout(() => {

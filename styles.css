@@ -565,3 +565,28 @@ canvas#dust-layer {
   pointer-events: none;
   opacity: 0.8;
 }
+
+/* CPF Input */
+#cpf-input {
+  width: 100%;
+  padding: 1.2rem;
+  border-radius: 100px;
+  border: 2px solid var(--glass-border);
+  background: rgba(0, 0, 0, 0.2);
+  color: #fff;
+  font-size: 1.5rem;
+  font-weight: 800;
+  text-align: center;
+  outline: none;
+  transition: all 0.3s;
+  letter-spacing: 2px;
+}
+
+#cpf-input:focus {
+  border-color: var(--pink-main);
+  box-shadow: 0 0 15px rgba(217, 70, 239, 0.4);
+}
+
+#cpf-input::placeholder {
+  color: rgba(255, 255, 255, 0.3);
+}
