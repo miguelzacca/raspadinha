@@ -116,9 +116,34 @@ document.addEventListener('DOMContentLoaded', () => {
                 const data = await res.json();
 
                 if (res.ok && data.success) {
-                    startTransition();
+                    if (data.already_used) {
+                        // CPF já usado — redireciona para pagamento
+                        cpfError.innerHTML = "Você já resgatou sua chance grátis! <br>Redirecionando para jogar novamente por R$ 3,00...";
+                        cpfError.style.display = 'block';
+                        cpfError.style.color = '#fbbf24';
+                        resetCpfBtn();
+
+                        setTimeout(async () => {
+                            try {
+                                const checkoutRes = await fetch('/api/checkout', {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({ price: 3.00, description: 'Nova Raspadinha (R$ 3,00)' })
+                                });
+                                const checkoutData = await checkoutRes.json();
+                                if (checkoutData.url) {
+                                    window.location.href = checkoutData.url;
+                                }
+                            } catch {
+                                cpfError.innerHTML = "Erro ao redirecionar. Tente novamente.";
+                                cpfError.style.color = '#f87171';
+                            }
+                        }, 2000);
+                    } else {
+                        startTransition();
+                    }
                 } else {
-                    cpfError.innerText = data.error || "Você já resgatou sua chance grátis!";
+                    cpfError.innerText = data.error || "Erro ao validar CPF.";
                     cpfError.style.display = 'block';
                     resetCpfBtn();
                 }

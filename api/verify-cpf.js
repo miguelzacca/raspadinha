@@ -34,7 +34,7 @@ export default async function handler(req, res) {
         });
 
         if (check.rows && check.rows.length > 0) {
-            return res.status(403).json({ error: "Este CPF já resgatou a chance grátis." });
+            return res.status(200).json({ success: true, already_used: true });
         }
 
         // Registra participação
