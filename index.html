@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Sorteio Premium</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+    <!-- Premium Ambient Background -->
+    <div class="ambient-background">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+        <div class="noise-overlay"></div>
+    </div>
+
+    <main class="app-container">
+        
+        <!-- Step 1: Questionnaire -->
+        <section id="step-questionnaire" class="view-state active">
+            <div class="glass-panel">
+                <div class="progress-bar-container">
+                    <div class="progress-bar" id="quiz-progress" style="width: 10%"></div>
+                </div>
+                
+                <header class="quiz-header">
+                    <span class="badge">Pesquisa Exclusiva</span>
+                    <h1>Desbloqueie sua <br><span class="text-gradient">Raspadinha Premium</span></h1>
+                    <p>Responda para ganhar 1 chance 100% gratuita.</p>
+                </header>
+
+                <div class="questions-wrapper">
+                    <div class="question-slide active" data-step="1">
+                        <h3 class="question-text">Qual seu smartphone atual?</h3>
+                        <div class="options-grid">
+                            <button class="option-card" type="button"><i data-lucide="apple" class="icon"></i><span>Apple</span></button>
+                            <button class="option-card" type="button"><i data-lucide="smartphone" class="icon"></i><span>Samsung</span></button>
+                            <button class="option-card" type="button"><i data-lucide="zap" class="icon"></i><span>Xiaomi</span></button>
+                            <button class="option-card" type="button"><i data-lucide="more-horizontal" class="icon"></i><span>Outro</span></button>
+                        </div>
+                    </div>
+
+                    <div class="question-slide" data-step="2">
+                        <h3 class="question-text">Onde você faz mais compras?</h3>
+                        <div class="options-grid">
+                            <button class="option-card" type="button"><i data-lucide="shopping-bag" class="icon"></i><span>Shopee</span></button>
+                            <button class="option-card" type="button"><i data-lucide="shirt" class="icon"></i><span>Shein</span></button>
+                            <button class="option-card" type="button"><i data-lucide="package" class="icon"></i><span>Mercado Livre</span></button>
+                            <button class="option-card" type="button"><i data-lucide="store" class="icon"></i><span>Físicas</span></button>
+                        </div>
+                    </div>
+
+                    <div class="question-slide" data-step="3">
+                        <h3 class="question-text">Como descobriu este sorteio?</h3>
+                        <div class="options-grid">
+                            <button class="option-card" type="button"><i data-lucide="camera" class="icon"></i><span>Instagram</span></button>
+                            <button class="option-card" type="button"><i data-lucide="video" class="icon"></i><span>TikTok</span></button>
+                            <button class="option-card" type="button"><i data-lucide="globe" class="icon"></i><span>Facebook</span></button>
+                            <button class="option-card" type="button"><i data-lucide="users" class="icon"></i><span>Amigos</span></button>
+                        </div>
+                    </div>
+
+                    <div class="question-slide" data-step="4">
+                        <h3 class="question-text">Qual sua categoria favorita?</h3>
+                        <div class="options-grid">
+                            <button class="option-card" type="button"><i data-lucide="shirt" class="icon"></i><span>Roupas</span></button>
+                            <button class="option-card" type="button"><i data-lucide="laptop" class="icon"></i><span>Eletrônicos</span></button>
+                            <button class="option-card" type="button"><i data-lucide="sparkles" class="icon"></i><span>Beleza</span></button>
+                            <button class="option-card" type="button"><i data-lucide="home" class="icon"></i><span>Casa</span></button>
+                        </div>
+                    </div>
+
+                    <div class="question-slide" data-step="5">
+                        <h3 class="question-text">Frequência de compras online?</h3>
+                        <div class="options-grid">
+                            <button class="option-card" type="button"><i data-lucide="calendar" class="icon"></i><span>Semanal</span></button>
+                            <button class="option-card" type="button"><i data-lucide="calendar-days" class="icon"></i><span>Mensal</span></button>
+                            <button class="option-card" type="button"><i data-lucide="battery-low" class="icon"></i><span>Raro</span></button>
+                            <button class="option-card" type="button"><i data-lucide="ban" class="icon"></i><span>Nunca</span></button>
+                        </div>
+                    </div>
+
+                    <div class="question-slide" data-step="6">
+                        <h3 class="question-text">Método de pagamento favorito?</h3>
+                        <div class="options-grid">
+                            <button class="option-card" type="button"><i data-lucide="qr-code" class="icon"></i><span>PIX</span></button>
+                            <button class="option-card" type="button"><i data-lucide="credit-card" class="icon"></i><span>Cartão</span></button>
+                            <button class="option-card" type="button"><i data-lucide="file-text" class="icon"></i><span>Boleto</span></button>
+                            <button class="option-card" type="button"><i data-lucide="banknote" class="icon"></i><span>Dinheiro</span></button>
+                        </div>
+                    </div>
+
+                    <div class="question-slide" data-step="7">
+                        <h3 class="question-text">Estilo de fragrância preferido?</h3>
+                        <div class="options-grid">
+                            <button class="option-card" type="button"><i data-lucide="candy" class="icon"></i><span>Doce</span></button>
+                            <button class="option-card" type="button"><i data-lucide="tree-pine" class="icon"></i><span>Amadeirado</span></button>
+                            <button class="option-card" type="button"><i data-lucide="flower" class="icon"></i><span>Floral</span></button>
+                            <button class="option-card" type="button"><i data-lucide="citrus" class="icon"></i><span>Cítrico</span></button>
+                        </div>
+                    </div>
+
+                    <div class="question-slide" data-step="8">
+                        <h3 class="question-text">O que mais atrai em um produto?</h3>
+                        <div class="options-grid">
+                            <button class="option-card" type="button"><i data-lucide="tag" class="icon"></i><span>Preço</span></button>
+                            <button class="option-card" type="button"><i data-lucide="award" class="icon"></i><span>Qualidade</span></button>
+                            <button class="option-card" type="button"><i data-lucide="verified" class="icon"></i><span>Marca</span></button>
+                            <button class="option-card" type="button"><i data-lucide="truck" class="icon"></i><span>Frete Grátis</span></button>
+                        </div>
+                    </div>
+
+                    <div class="question-slide" data-step="9">
+                        <h3 class="question-text">Rede social que mais usa?</h3>
+                        <div class="options-grid">
+                            <button class="option-card" type="button"><i data-lucide="camera" class="icon"></i><span>Instagram</span></button>
+                            <button class="option-card" type="button"><i data-lucide="video" class="icon"></i><span>TikTok</span></button>
+                            <button class="option-card" type="button"><i data-lucide="youtube" class="icon"></i><span>YouTube</span></button>
+                            <button class="option-card" type="button"><i data-lucide="message-circle" class="icon"></i><span>WhatsApp</span></button>
+                        </div>
+                    </div>
+
+                    <div class="question-slide" data-step="10">
+                        <h3 class="question-text">Indicaria promoções a amigos?</h3>
+                        <div class="options-grid">
+                            <button class="option-card" type="button"><i data-lucide="thumbs-up" class="icon"></i><span>Com certeza</span></button>
+                            <button class="option-card" type="button"><i data-lucide="help-circle" class="icon"></i><span>Talvez</span></button>
+                            <button class="option-card" type="button"><i data-lucide="scale" class="icon"></i><span>Depende</span></button>
+                            <button class="option-card" type="button"><i data-lucide="thumbs-down" class="icon"></i><span>Não</span></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Step 2: Scratchcard -->
+        <section id="step-scratchcard" class="view-state">
+            <div class="scratch-header">
+                <h2>Sua Chance de Ouro</h2>
+                <p>Deslize o dedo para raspar e revelar seu destino.</p>
+            </div>
+
+            <!-- The Ticket -->
+            <div class="ticket-container">
+                <div class="ticket-border-glow"></div>
+                <div class="ticket">
+                    <!-- Revealed Result underneath -->
+                    <div class="ticket-result" id="ticket-result">
+                        <div class="result-glow"></div>
+                        <div class="result-content">
+                            <i data-lucide="loader-2" class="spin-icon" id="loading-icon"></i>
+                            <div id="result-texts" class="hidden">
+                                <h3 id="prize-status" class="prize-status">VENCEDOR!</h3>
+                                <div id="prize-amount" class="prize-amount">R$ 50,00</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Scratch Canvas on top -->
+                    <canvas id="scratch-layer"></canvas>
+                    <!-- Dust Particles Layer -->
+                    <canvas id="dust-layer"></canvas>
+                </div>
+            </div>
+
+            <div class="action-footer hidden" id="action-footer">
+                <p id="action-msg" class="action-msg">Não foi dessa vez...</p>
+                <button class="btn-glow" id="btn-retry">
+                    <span>Tentar Novamente - R$ 3,00</span>
+                    <i data-lucide="arrow-right"></i>
+                </button>
+            </div>
+        </section>
+
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
