@@ -380,8 +380,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         const scratch = (e) => {
+            if (e.cancelable) e.preventDefault();
             if (!isScratching || scratchCompleted || !scratchResult) return;
-            e.preventDefault();
 
             const pos = getPos(e);
             const now = Date.now();
@@ -432,6 +432,7 @@ document.addEventListener('DOMContentLoaded', () => {
         };
 
         const startScratch = (e) => {
+            if (e.cancelable) e.preventDefault();
             isScratching = true;
             lastPos = getPos(e);
             lastScratchTime = Date.now();
@@ -464,7 +465,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const step = 16;
             const total = pixels.length / 4;
             for (let i = 3; i < pixels.length; i += step * 4) {
-                if (pixels[i] === 0) cleared++;
+                if (pixels[i] < 25) cleared++;
             }
             scratchPercent = (cleared / (total / step)) * 100;
 
