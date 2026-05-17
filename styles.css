@@ -1845,3 +1845,106 @@ canvas#dust-layer {
     font-size: 2rem;
   }
 }
+
+/* ===== LEGAL FOOTER ===== */
+.legal-footer {
+  width: 100%;
+  padding: 2.5rem 1rem 3rem;
+  background: var(--bg-base);
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  margin-top: 2rem;
+  position: relative;
+  z-index: 10;
+}
+
+.legal-content {
+  max-width: 600px;
+  margin: 0 auto;
+  text-align: center;
+  color: var(--text-secondary);
+}
+
+.legal-gov-badges {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: rgba(16, 185, 129, 0.05);
+  border: 1px solid rgba(16, 185, 129, 0.15);
+  border-radius: 100px;
+  color: var(--emerald);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  margin-bottom: 1.5rem;
+}
+
+.legal-gov-badges i {
+  width: 16px;
+  height: 16px;
+}
+
+.legal-text {
+  font-size: 0.75rem;
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
+  color: rgba(241, 245, 249, 0.6);
+}
+
+.legal-link {
+  color: rgba(241, 245, 249, 0.8);
+  text-decoration: underline;
+  text-decoration-color: rgba(255, 255, 255, 0.2);
+  transition: all 0.2s ease;
+}
+
+.legal-link:hover {
+  color: var(--gold-main);
+  text-decoration-color: var(--gold-main);
+}
+
+.legal-company-info {
+  font-size: 0.7rem;
+  color: rgba(241, 245, 249, 0.4);
+  line-height: 1.5;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.legal-bottom-links {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  font-size: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.legal-divider {
+  color: rgba(255, 255, 255, 0.2);
+  font-size: 0.6rem;
+}
+
+.legal-age-warning {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 14px;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  font-size: 0.75rem;
+  color: rgba(241, 245, 249, 0.5);
+}
+
+.age-badge {
+  background: rgba(239, 68, 68, 0.15);
+  color: #fca5a5;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  font-weight: 800;
+  font-size: 0.65rem;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
