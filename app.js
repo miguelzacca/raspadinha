@@ -20,16 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const viewTransition = document.getElementById('step-transition');
     const viewScratch = document.getElementById('step-scratchcard');
 
-    // ===== INIT QUESTIONNAIRE STATE =====
-    if (localStorage.getItem('questionnaireCompleted') === 'true') {
-        currentStep = slides.length;
-        if (stepCurrent) stepCurrent.textContent = currentStep;
-        if (progressBar) progressBar.style.width = '100%';
-        slides.forEach(slide => slide.classList.remove('active'));
-        const lastSlide = document.querySelector(`.question-slide[data-step="${currentStep}"]`);
-        if (lastSlide) lastSlide.classList.add('active');
-    }
-
+    // ===== CANVAS & UI ELEMENTS =====
     const canvas = document.getElementById('scratch-layer');
     const ctx = canvas ? canvas.getContext('2d', { willReadFrequently: true }) : null;
     const dustCanvas = document.getElementById('dust-layer');
@@ -53,10 +44,51 @@ document.addEventListener('DOMContentLoaded', () => {
     // ===== PARTICIPANTS COUNTER =====
     animateParticipants();
 
-    // ===== CHECK PAID RETURN =====
+    // ===== RESTORE STATE ON PAGE RELOAD =====
     const urlParams = new URLSearchParams(window.location.search);
+    const gameUnlocked = localStorage.getItem('gameUnlocked') === 'true';
+    const selectedGame = localStorage.getItem('selectedGame'); // 'scratch' | 'ttt' | null
+
     if (urlParams.has('paid')) {
+        // Returning from payment — go straight to game select
         setTimeout(() => startTransition(), 50);
+    } else if (gameUnlocked && selectedGame === 'scratch') {
+        // User had already chosen Raspadinha — restore directly
+        viewQuiz.classList.remove('active');
+        viewQuiz.style.display = 'none';
+        setTimeout(() => {
+            viewScratch.style.display = 'block';
+            void viewScratch.offsetWidth;
+            viewScratch.classList.add('active');
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+            initScratchCard();
+            fetchScratchResult();
+        }, 50);
+    } else if (gameUnlocked && selectedGame === 'ttt') {
+        // User had already chosen Jogo da Velha — restore directly
+        viewQuiz.classList.remove('active');
+        viewQuiz.style.display = 'none';
+        const _vTTT = document.getElementById('step-ttt');
+        setTimeout(() => {
+            _vTTT.style.display = 'block';
+            void _vTTT.offsetWidth;
+            _vTTT.classList.add('active');
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+            initTTT();
+        }, 50);
+    } else if (gameUnlocked) {
+        // Game unlocked but no specific game chosen — go to selection
+        viewQuiz.classList.remove('active');
+        viewQuiz.style.display = 'none';
+        setTimeout(() => showGameSelect(), 50);
+    } else if (localStorage.getItem('questionnaireCompleted') === 'true') {
+        // Quiz done but game not yet unlocked — show CPF step
+        currentStep = slides.length;
+        if (stepCurrent) stepCurrent.textContent = currentStep;
+        if (progressBar) progressBar.style.width = '100%';
+        slides.forEach(slide => slide.classList.remove('active'));
+        const lastSlide = document.querySelector(`.question-slide[data-step="${currentStep}"]`);
+        if (lastSlide) lastSlide.classList.add('active');
     }
 
     // ===== QUIZ LOGIC =====
@@ -225,6 +257,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const viewTTT = document.getElementById('step-ttt');
 
     function showGameSelect() {
+        localStorage.setItem('gameUnlocked', 'true');
+        localStorage.removeItem('selectedGame'); // not yet chosen
         viewGameSelect.style.display = 'block';
         void viewGameSelect.offsetWidth;
         viewGameSelect.classList.add('active');
@@ -244,6 +278,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (btnChooseScratch) {
         btnChooseScratch.addEventListener('click', () => {
+            localStorage.setItem('selectedGame', 'scratch');
             hideGameSelect(() => {
                 viewScratch.style.display = 'block';
                 void viewScratch.offsetWidth;
@@ -257,6 +292,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (btnChooseTTT) {
         btnChooseTTT.addEventListener('click', () => {
+            localStorage.setItem('selectedGame', 'ttt');
             hideGameSelect(() => {
                 viewTTT.style.display = 'block';
                 void viewTTT.offsetWidth;
