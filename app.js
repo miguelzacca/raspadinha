@@ -311,6 +311,31 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    const btnBackScratch = document.getElementById('btn-back-scratch');
+    const btnBackTTT = document.getElementById('btn-back-ttt');
+
+    if (btnBackScratch) {
+        btnBackScratch.addEventListener('click', () => {
+            localStorage.removeItem('selectedGame');
+            viewScratch.classList.remove('active');
+            setTimeout(() => {
+                viewScratch.style.display = 'none';
+                showGameSelect();
+            }, 500);
+        });
+    }
+
+    if (btnBackTTT) {
+        btnBackTTT.addEventListener('click', () => {
+            localStorage.removeItem('selectedGame');
+            viewTTT.classList.remove('active');
+            setTimeout(() => {
+                viewTTT.style.display = 'none';
+                showGameSelect();
+            }, 500);
+        });
+    }
+
     // ===== MINIMAX TIC-TAC-TOE ENGINE =====
     function initTTT() {
         const PLAYER = 'X';
@@ -600,6 +625,19 @@ document.addEventListener('DOMContentLoaded', () => {
     // ===== SCRATCH CARD ENGINE =====
     function initScratchCard() {
         if (!canvas || !ctx) return;
+
+        scratchCompleted = false;
+        scratchPercent = 0;
+        isScratching = false;
+        canvas.style.opacity = '1';
+        canvas.style.display = 'block';
+        if (scratchProgressBar) scratchProgressBar.classList.remove('visible');
+        if (scratchProgressFill) scratchProgressFill.style.width = '0%';
+        actionFooter.classList.add('hidden');
+        resultTexts.classList.add('hidden');
+        ticketResult.classList.remove('win', 'lose');
+        const loadingIcon = document.getElementById('loading-icon');
+        if (loadingIcon) loadingIcon.classList.remove('hidden');
 
         const rect = canvas.parentElement.getBoundingClientRect();
         const dpr = window.devicePixelRatio || 1;
