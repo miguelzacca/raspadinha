@@ -50,8 +50,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const selectedGame = localStorage.getItem('selectedGame'); // 'scratch' | 'ttt' | null
 
     if (urlParams.has('paid')) {
-        // Returning from payment — clear block states
+        // Returning from payment — clear all block states
         localStorage.removeItem('tttNeedsPay');
+        localStorage.removeItem('scratchNeedsPay');
         localStorage.setItem('gameUnlocked', 'true');
         const paidGame = localStorage.getItem('selectedGame');
 
@@ -92,8 +93,13 @@ document.addEventListener('DOMContentLoaded', () => {
             void viewScratch.offsetWidth;
             viewScratch.classList.add('active');
             if (typeof lucide !== 'undefined') lucide.createIcons();
-            initScratchCard();
-            fetchScratchResult();
+            if (localStorage.getItem('scratchNeedsPay') === 'true') {
+                // Already played — show payment wall without running a new game
+                showScratchPayRequired();
+            } else {
+                initScratchCard();
+                fetchScratchResult();
+            }
         }, 50);
     } else if (gameUnlocked && selectedGame === 'ttt') {
         // User had already chosen Jogo da Velha — restore directly
@@ -322,8 +328,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 void viewScratch.offsetWidth;
                 viewScratch.classList.add('active');
                 if (typeof lucide !== 'undefined') lucide.createIcons();
-                initScratchCard();
-                fetchScratchResult();
+                if (localStorage.getItem('scratchNeedsPay') === 'true') {
+                    showScratchPayRequired();
+                } else {
+                    initScratchCard();
+                    fetchScratchResult();
+                }
             });
         });
     }
@@ -1130,6 +1140,36 @@ document.addEventListener('DOMContentLoaded', () => {
             actionMsg.style.color = "#f87171";
         }
 
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+        actionFooter.classList.remove('hidden');
+        
+        // Block further free plays
+        localStorage.setItem('scratchNeedsPay', 'true');
+    }
+
+    // ===== SCRATCH PAY REQUIRED WALL =====
+    function showScratchPayRequired() {
+        if (!canvas) return;
+        
+        canvas.style.display = 'none';
+        if (dustCanvas) dustCanvas.style.display = 'none';
+        if (scratchProgressBar) scratchProgressBar.classList.remove('visible');
+
+        ticketResult.classList.remove('win');
+        ticketResult.classList.add('lose');
+        
+        prizeStatus.innerText = "NOVA CHANCE";
+        prizeAmount.innerText = "Comprar Ticket";
+        if (prizeLabel) prizeLabel.innerText = "Jogue novamente";
+        if (prizeIconContainer) prizeIconContainer.innerHTML = '<i data-lucide="ticket" class="prize-main-icon" style="width:48px;height:48px;color:#fbbf24"></i>';
+        
+        const loadingIcon = document.getElementById('loading-icon');
+        if (loadingIcon) loadingIcon.classList.add('hidden');
+        resultTexts.classList.remove('hidden');
+
+        actionMsg.innerText = "Seu ticket anterior já foi raspado.";
+        actionMsg.style.color = "#fbbf24";
+        
         if (typeof lucide !== 'undefined') lucide.createIcons();
         actionFooter.classList.remove('hidden');
     }
