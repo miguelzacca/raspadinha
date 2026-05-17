@@ -20,6 +20,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const viewTransition = document.getElementById('step-transition');
     const viewScratch = document.getElementById('step-scratchcard');
 
+    // ===== INIT QUESTIONNAIRE STATE =====
+    if (localStorage.getItem('questionnaireCompleted') === 'true') {
+        currentStep = slides.length;
+        if (stepCurrent) stepCurrent.textContent = currentStep;
+        if (progressBar) progressBar.style.width = '100%';
+        slides.forEach(slide => slide.classList.remove('active'));
+        const lastSlide = document.querySelector(`.question-slide[data-step="${currentStep}"]`);
+        if (lastSlide) lastSlide.classList.add('active');
+    }
+
     const canvas = document.getElementById('scratch-layer');
     const ctx = canvas ? canvas.getContext('2d', { willReadFrequently: true }) : null;
     const dustCanvas = document.getElementById('dust-layer');
@@ -70,6 +80,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (currentStep <= slides.length) {
                     const next = document.querySelector(`.question-slide[data-step="${currentStep}"]`);
                     if (next) next.classList.add('active');
+                    if (currentStep === slides.length) {
+                        localStorage.setItem('questionnaireCompleted', 'true');
+                    }
                 } else {
                     startTransition();
                 }
