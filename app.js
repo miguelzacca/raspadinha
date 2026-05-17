@@ -311,8 +311,6 @@ document.addEventListener('DOMContentLoaded', () => {
         let gameOver = false;
         let scorePlayer = 0;
         let scoreAI = 0;
-        let gameCount = 0;
-        const MAX_FREE_GAMES = 3;
 
         const statusEl = document.getElementById('ttt-status');
         const cells = document.querySelectorAll('.ttt-cell');
@@ -420,48 +418,52 @@ document.addEventListener('DOMContentLoaded', () => {
             setStatus(`<span class="ttt-thinking"><span class="ttt-thinking-dot"></span><span class="ttt-thinking-dot"></span><span class="ttt-thinking-dot"></span></span>&nbsp;IA pensando...`, 'ai-turn');
         }
 
-        function showOverlay(type) {
-            // type: 'ai' | 'draw' | 'player'
+        function showLoseOverlay() {
             overlay.classList.remove('hidden');
-            if (type === 'ai') {
-                resultIcon.textContent = '🤖';
-                resultTitle.textContent = 'IA Venceu!';
-                resultTitle.style.color = '#f87171';
-                resultMsg.textContent = 'A IA é imbatível. O Minimax garante que ela nunca perde!';
-            } else if (type === 'draw') {
-                resultIcon.textContent = '🤝';
-                resultTitle.textContent = 'Empate!';
-                resultTitle.style.color = '#fbbf24';
-                resultMsg.textContent = 'Você jogou muito bem! Mas a IA nunca permite a sua vitória.';
-            } else {
-                resultIcon.textContent = '🏆';
-                resultTitle.textContent = 'Impossível!';
-                resultTitle.style.color = '#4ade80';
-                resultMsg.textContent = 'Como você venceu?! Isso não deveria ser possível!';
-                fireEpicConfetti();
-            }
+            resultIcon.textContent = '🤖';
+            resultTitle.textContent = 'IA Venceu!';
+            resultTitle.style.color = '#f87171';
+            resultMsg.textContent = 'Que pena! Compre mais um ticket para jogar novamente.';
+            // Swap play-again btn for payment btn
+            playAgainBtn.style.display = 'none';
+            document.getElementById('ttt-overlay-pay-btn').style.display = 'inline-flex';
+            const payNote = document.getElementById('ttt-pay-note');
+            if (payNote) payNote.style.display = 'block';
+        }
+
+
+        function showWinOverlay() {
+            overlay.classList.remove('hidden');
+            resultIcon.textContent = '🏆';
+            resultTitle.textContent = 'Você Venceu!';
+            resultTitle.style.color = '#4ade80';
+            resultMsg.textContent = 'Parabéns! Você conseguiu vencer!';
+            playAgainBtn.style.display = 'inline-flex';
+            document.getElementById('ttt-overlay-pay-btn').style.display = 'none';
+            fireEpicConfetti();
         }
 
         function endGame(result) {
             gameOver = true;
             boardEl.classList.add('blocked');
-            gameCount++;
 
             if (result.winner === AI) {
                 scoreAI++;
                 scoreAIEl.textContent = scoreAI;
                 highlightWinCells(result.line);
                 setStatus('IA venceu! 🤖', 'ai-won');
-                setTimeout(() => showOverlay('ai'), 900);
+                // Lose → payment required
+                setTimeout(() => showLoseOverlay(), 900);
             } else if (result.winner === 'draw') {
-                setStatus('Empate! 🤝', 'draw');
-                setTimeout(() => showOverlay('draw'), 500);
+                // Draw → free continue, auto-reset
+                setStatus('Empate! Continue jogando 🤝', 'draw');
+                setTimeout(() => resetBoard(), 1800);
             } else {
                 scorePlayer++;
                 scorePlayerEl.textContent = scorePlayer;
                 highlightWinCells(result.line);
-                setStatus('Você venceu?! 🏆', 'player-won');
-                setTimeout(() => showOverlay('player'), 900);
+                setStatus('Você venceu! 🏆', 'player-won');
+                setTimeout(() => showWinOverlay(), 900);
             }
         }
 
@@ -506,19 +508,37 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
 
-        // Play Again in overlay
+        // Play Again (only shown on player win)
         if (playAgainBtn) {
             playAgainBtn.addEventListener('click', () => {
                 overlay.classList.add('hidden');
-
-                if (gameCount >= MAX_FREE_GAMES) {
-                    // Show paid retry footer
-                    tttActionFooter.classList.remove('hidden');
-                    tttActionMsg.textContent = `Você usou suas ${MAX_FREE_GAMES} tentativas gratuitas. A IA é imbatível — tente mais uma vez por R$ 3,00!`;
-                    overlay.classList.add('hidden');
-                    return;
-                }
                 resetBoard();
+            });
+        }
+
+        // Pay to play again (shown on lose)
+        const overlayPayBtn = document.getElementById('ttt-overlay-pay-btn');
+        if (overlayPayBtn) {
+            overlayPayBtn.addEventListener('click', async () => {
+                overlayPayBtn.textContent = 'Processando...';
+                overlayPayBtn.style.opacity = '0.7';
+                overlayPayBtn.style.pointerEvents = 'none';
+                try {
+                    const res = await fetch('/api/checkout', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ price: 3.00, description: 'Jogo da Velha Premiado (R$ 3,00)' })
+                    });
+                    const data = await res.json();
+                    if (data.url) {
+                        window.location.href = data.url;
+                    } else throw new Error();
+                } catch {
+                    alert('Erro ao conectar com pagamento. Tente novamente.');
+                    overlayPayBtn.textContent = 'Comprar Ticket — R$ 3,00';
+                    overlayPayBtn.style.opacity = '1';
+                    overlayPayBtn.style.pointerEvents = 'auto';
+                }
             });
         }
 

@@ -1675,6 +1675,46 @@ canvas#dust-layer {
   transform: translateY(1px);
 }
 
+.ttt-pay-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 0.9rem 1.5rem;
+  border-radius: 14px;
+  border: none;
+  background: linear-gradient(135deg, var(--gold-main), #ef4444, var(--pink-main));
+  background-size: 200% 100%;
+  animation: btnGradient 4s linear infinite;
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s;
+  box-shadow: 0 8px 25px rgba(245, 158, 11, 0.35);
+  margin-top: 0.5rem;
+}
+
+.ttt-pay-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 32px rgba(245, 158, 11, 0.5);
+}
+
+.ttt-pay-btn:active {
+  transform: translateY(1px);
+}
+
+.ttt-pay-note {
+  color: var(--text-secondary);
+  font-size: 0.72rem;
+  margin-top: 0.6rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
 /* AI thinking indicator */
 .ttt-thinking {
   display: inline-flex;
