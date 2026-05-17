@@ -1715,42 +1715,35 @@ canvas#dust-layer {
   gap: 4px;
 }
 
+.game-back-bar {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
 .btn-change-game {
-  position: absolute;
-  top: 20px;
-  left: 20px;
   display: inline-flex;
   align-items: center;
   gap: 6px;
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.1);
   color: var(--text-secondary);
-  padding: 6px 12px;
+  padding: 5px 12px;
   border-radius: 100px;
-  font-size: 0.75rem;
+  font-size: 0.72rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.3s;
-  z-index: 50;
+  transition: all 0.25s;
 }
 
 .btn-change-game:hover {
   background: rgba(255, 255, 255, 0.1);
   color: #fff;
-  transform: translateX(-2px);
+  gap: 8px;
 }
 
 .btn-change-game:active {
-  transform: translateX(0);
-}
-
-@media (max-width: 400px) {
-  .btn-change-game {
-    top: 10px;
-    left: 10px;
-    padding: 5px 10px;
-    font-size: 0.7rem;
-  }
+  opacity: 0.7;
 }
 
 /* AI thinking indicator */
