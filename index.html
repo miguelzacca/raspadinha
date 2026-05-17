@@ -242,13 +242,123 @@
           <div class="ring-segment"></div>
           <div class="ring-segment"></div>
         </div>
-        <h2 class="transition-title">Preparando sua raspadinha...</h2>
+        <h2 class="transition-title">Preparando seu prêmio...</h2>
         <p class="transition-sub">Gerando ticket exclusivo</p>
         <div class="transition-steps">
           <div class="t-step" id="ts-1"><i data-lucide="check-circle"></i><span>Validação concluída</span></div>
           <div class="t-step" id="ts-2"><i data-lucide="ticket"></i><span>Gerando ticket...</span></div>
           <div class="t-step" id="ts-3"><i data-lucide="gift"></i><span>Carregando prêmios...</span></div>
         </div>
+      </div>
+    </section>
+
+    <!-- Step: Game Selection -->
+    <section id="step-game-select" class="view-state">
+      <div class="game-select-content">
+        <div class="game-select-badge">
+          <i data-lucide="sparkles" style="width:14px;height:14px"></i>
+          ESCOLHA SUA SORTE
+        </div>
+        <h2 class="game-select-title">Qual jogo você<br><span class="text-gradient">quer jogar?</span></h2>
+        <p class="game-select-sub">Escolha uma das opções abaixo para tentar ganhar seu prêmio!</p>
+
+        <div class="game-cards-grid">
+          <!-- Raspadinha Card -->
+          <button class="game-choice-card" id="btn-choose-scratch" type="button">
+            <div class="game-choice-glow glow-gold"></div>
+            <div class="game-choice-icon">
+              <i data-lucide="ticket" style="width:40px;height:40px"></i>
+            </div>
+            <h3>Raspadinha</h3>
+            <p>Raspe e revele seu prêmio instantâneo!</p>
+            <div class="game-choice-tag tag-gold">Clássico</div>
+          </button>
+
+          <!-- Jogo da Velha Card -->
+          <button class="game-choice-card" id="btn-choose-ttt" type="button">
+            <div class="game-choice-glow glow-purple"></div>
+            <div class="game-choice-icon icon-purple">
+              <i data-lucide="grid-3x3" style="width:40px;height:40px"></i>
+            </div>
+            <h3>Jogo da Velha</h3>
+            <p>Vença a IA e ganhe R$&nbsp;500 em prêmios!</p>
+            <div class="game-choice-tag tag-purple">Desafio</div>
+          </button>
+        </div>
+
+        <p class="game-select-disclaimer">
+          <i data-lucide="shield-check" style="width:12px;height:12px;display:inline;vertical-align:middle"></i>
+          Participação 100% gratuita — sem compromisso
+        </p>
+      </div>
+    </section>
+
+    <!-- Step: Jogo da Velha -->
+    <section id="step-ttt" class="view-state">
+      <div class="ttt-header">
+        <div class="ttt-badge">
+          <i data-lucide="grid-3x3" style="width:14px;height:14px"></i>
+          JOGO DA VELHA PREMIADO
+        </div>
+        <h2 class="ttt-title">Desafie a <span class="text-gradient">IA Suprema</span></h2>
+        <p class="ttt-sub">Vença e ganhe <strong style="color:#fbbf24">R$ 500,00</strong> em prêmios</p>
+      </div>
+
+      <!-- Status -->
+      <div class="ttt-status-bar">
+        <div class="ttt-status-pill" id="ttt-status">Sua vez — jogue com X</div>
+      </div>
+
+      <!-- Board -->
+      <div class="ttt-board" id="ttt-board">
+        <div class="ttt-cell" id="ttt-0" data-index="0"></div>
+        <div class="ttt-cell" id="ttt-1" data-index="1"></div>
+        <div class="ttt-cell" id="ttt-2" data-index="2"></div>
+        <div class="ttt-cell" id="ttt-3" data-index="3"></div>
+        <div class="ttt-cell" id="ttt-4" data-index="4"></div>
+        <div class="ttt-cell" id="ttt-5" data-index="5"></div>
+        <div class="ttt-cell" id="ttt-6" data-index="6"></div>
+        <div class="ttt-cell" id="ttt-7" data-index="7"></div>
+        <div class="ttt-cell" id="ttt-8" data-index="8"></div>
+      </div>
+
+      <!-- Score -->
+      <div class="ttt-scoreboard">
+        <div class="ttt-score-item">
+          <span class="ttt-score-label">VOCÊ</span>
+          <span class="ttt-score-num" id="ttt-score-player">0</span>
+        </div>
+        <div class="ttt-score-divider">VS</div>
+        <div class="ttt-score-item">
+          <span class="ttt-score-num" id="ttt-score-ai">0</span>
+          <span class="ttt-score-label">IA</span>
+        </div>
+      </div>
+
+      <!-- Result overlay inside board area -->
+      <div class="ttt-result-overlay hidden" id="ttt-result-overlay">
+        <div class="ttt-result-box" id="ttt-result-box">
+          <div class="ttt-result-icon" id="ttt-result-icon">🤖</div>
+          <h3 id="ttt-result-title">IA Venceu!</h3>
+          <p id="ttt-result-msg">A IA é imbatível. Tente novamente!</p>
+          <button class="ttt-play-again-btn" id="ttt-play-again">Jogar Novamente</button>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="action-footer hidden" id="ttt-action-footer">
+        <div class="result-card" id="ttt-result-card">
+          <p id="ttt-action-msg" class="action-msg">A IA é simplesmente imbatível...</p>
+        </div>
+        <button class="btn-glow btn-retry-glow" id="ttt-btn-retry">
+          <i data-lucide="refresh-cw" style="width:20px;height:20px"></i>
+          <span>Tentar Novamente — R$ 3,00</span>
+          <i data-lucide="arrow-right"></i>
+        </button>
+        <p class="retry-note">
+          <i data-lucide="shield" style="width:12px;height:12px;display:inline;vertical-align:middle"></i>
+          Pagamento seguro via InfinitePay
+        </p>
       </div>
     </section>
 

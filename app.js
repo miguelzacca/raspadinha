@@ -209,21 +209,312 @@ document.addEventListener('DOMContentLoaded', () => {
             setTimeout(() => { ts3.classList.add('active'); }, 2600);
             setTimeout(() => { ts3.classList.remove('active'); ts3.classList.add('done'); }, 3400);
 
-            // Move to scratchcard
+            // Move to game selection
             setTimeout(() => {
                 viewTransition.classList.remove('active');
                 setTimeout(() => {
                     viewTransition.style.display = 'none';
-                    viewScratch.style.display = 'block';
-                    void viewScratch.offsetWidth;
-                    viewScratch.classList.add('active');
-                    if (typeof lucide !== 'undefined') lucide.createIcons();
-                    initScratchCard();
-                    fetchScratchResult();
+                    showGameSelect();
                 }, 500);
             }, 4000);
         }, 500);
     }
+
+    // ===== GAME SELECTION =====
+    const viewGameSelect = document.getElementById('step-game-select');
+    const viewTTT = document.getElementById('step-ttt');
+
+    function showGameSelect() {
+        viewGameSelect.style.display = 'block';
+        void viewGameSelect.offsetWidth;
+        viewGameSelect.classList.add('active');
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+    }
+
+    function hideGameSelect(cb) {
+        viewGameSelect.classList.remove('active');
+        setTimeout(() => {
+            viewGameSelect.style.display = 'none';
+            cb();
+        }, 500);
+    }
+
+    const btnChooseScratch = document.getElementById('btn-choose-scratch');
+    const btnChooseTTT = document.getElementById('btn-choose-ttt');
+
+    if (btnChooseScratch) {
+        btnChooseScratch.addEventListener('click', () => {
+            hideGameSelect(() => {
+                viewScratch.style.display = 'block';
+                void viewScratch.offsetWidth;
+                viewScratch.classList.add('active');
+                if (typeof lucide !== 'undefined') lucide.createIcons();
+                initScratchCard();
+                fetchScratchResult();
+            });
+        });
+    }
+
+    if (btnChooseTTT) {
+        btnChooseTTT.addEventListener('click', () => {
+            hideGameSelect(() => {
+                viewTTT.style.display = 'block';
+                void viewTTT.offsetWidth;
+                viewTTT.classList.add('active');
+                if (typeof lucide !== 'undefined') lucide.createIcons();
+                initTTT();
+            });
+        });
+    }
+
+    // ===== MINIMAX TIC-TAC-TOE ENGINE =====
+    function initTTT() {
+        const PLAYER = 'X';
+        const AI = 'O';
+        let board = Array(9).fill(null);
+        let gameOver = false;
+        let scorePlayer = 0;
+        let scoreAI = 0;
+        let gameCount = 0;
+        const MAX_FREE_GAMES = 3;
+
+        const statusEl = document.getElementById('ttt-status');
+        const cells = document.querySelectorAll('.ttt-cell');
+        const boardEl = document.getElementById('ttt-board');
+        const overlay = document.getElementById('ttt-result-overlay');
+        const resultIcon = document.getElementById('ttt-result-icon');
+        const resultTitle = document.getElementById('ttt-result-title');
+        const resultMsg = document.getElementById('ttt-result-msg');
+        const playAgainBtn = document.getElementById('ttt-play-again');
+        const scorePlayerEl = document.getElementById('ttt-score-player');
+        const scoreAIEl = document.getElementById('ttt-score-ai');
+        const tttActionFooter = document.getElementById('ttt-action-footer');
+        const tttActionMsg = document.getElementById('ttt-action-msg');
+        const tttBtnRetry = document.getElementById('ttt-btn-retry');
+
+        const WIN_LINES = [
+            [0,1,2],[3,4,5],[6,7,8],
+            [0,3,6],[1,4,7],[2,5,8],
+            [0,4,8],[2,4,6]
+        ];
+
+        function checkWinner(b) {
+            for (const [a,c,d] of WIN_LINES) {
+                if (b[a] && b[a] === b[c] && b[a] === b[d]) return { winner: b[a], line: [a,c,d] };
+            }
+            if (b.every(cell => cell)) return { winner: 'draw', line: [] };
+            return null;
+        }
+
+        function minimax(b, isMaximizing, depth, alpha, beta) {
+            const result = checkWinner(b);
+            if (result) {
+                if (result.winner === AI) return 10 - depth;
+                if (result.winner === PLAYER) return depth - 10;
+                return 0;
+            }
+            if (isMaximizing) {
+                let best = -Infinity;
+                for (let i = 0; i < 9; i++) {
+                    if (!b[i]) {
+                        b[i] = AI;
+                        best = Math.max(best, minimax(b, false, depth + 1, alpha, beta));
+                        b[i] = null;
+                        alpha = Math.max(alpha, best);
+                        if (beta <= alpha) break;
+                    }
+                }
+                return best;
+            } else {
+                let best = Infinity;
+                for (let i = 0; i < 9; i++) {
+                    if (!b[i]) {
+                        b[i] = PLAYER;
+                        best = Math.min(best, minimax(b, true, depth + 1, alpha, beta));
+                        b[i] = null;
+                        beta = Math.min(beta, best);
+                        if (beta <= alpha) break;
+                    }
+                }
+                return best;
+            }
+        }
+
+        function getBestMove(b) {
+            let bestVal = -Infinity;
+            let bestMove = -1;
+            for (let i = 0; i < 9; i++) {
+                if (!b[i]) {
+                    b[i] = AI;
+                    const val = minimax(b, false, 0, -Infinity, Infinity);
+                    b[i] = null;
+                    if (val > bestVal) { bestVal = val; bestMove = i; }
+                }
+            }
+            return bestMove;
+        }
+
+        function updateCells() {
+            cells.forEach((cell, i) => {
+                cell.textContent = '';
+                cell.className = 'ttt-cell';
+                if (board[i] === PLAYER) {
+                    cell.textContent = 'X';
+                    cell.classList.add('x-mark', 'taken');
+                } else if (board[i] === AI) {
+                    cell.textContent = 'O';
+                    cell.classList.add('o-mark', 'taken');
+                }
+            });
+        }
+
+        function highlightWinCells(line) {
+            line.forEach(i => {
+                cells[i].classList.add('win-cell');
+            });
+        }
+
+        function setStatus(text, cls) {
+            statusEl.className = 'ttt-status-pill';
+            if (cls) statusEl.classList.add(cls);
+            statusEl.innerHTML = text;
+        }
+
+        function showThinking() {
+            setStatus(`<span class="ttt-thinking"><span class="ttt-thinking-dot"></span><span class="ttt-thinking-dot"></span><span class="ttt-thinking-dot"></span></span>&nbsp;IA pensando...`, 'ai-turn');
+        }
+
+        function showOverlay(type) {
+            // type: 'ai' | 'draw' | 'player'
+            overlay.classList.remove('hidden');
+            if (type === 'ai') {
+                resultIcon.textContent = '🤖';
+                resultTitle.textContent = 'IA Venceu!';
+                resultTitle.style.color = '#f87171';
+                resultMsg.textContent = 'A IA é imbatível. O Minimax garante que ela nunca perde!';
+            } else if (type === 'draw') {
+                resultIcon.textContent = '🤝';
+                resultTitle.textContent = 'Empate!';
+                resultTitle.style.color = '#fbbf24';
+                resultMsg.textContent = 'Você jogou muito bem! Mas a IA nunca permite a sua vitória.';
+            } else {
+                resultIcon.textContent = '🏆';
+                resultTitle.textContent = 'Impossível!';
+                resultTitle.style.color = '#4ade80';
+                resultMsg.textContent = 'Como você venceu?! Isso não deveria ser possível!';
+                fireEpicConfetti();
+            }
+        }
+
+        function endGame(result) {
+            gameOver = true;
+            boardEl.classList.add('blocked');
+            gameCount++;
+
+            if (result.winner === AI) {
+                scoreAI++;
+                scoreAIEl.textContent = scoreAI;
+                highlightWinCells(result.line);
+                setStatus('IA venceu! 🤖', 'ai-won');
+                setTimeout(() => showOverlay('ai'), 900);
+            } else if (result.winner === 'draw') {
+                setStatus('Empate! 🤝', 'draw');
+                setTimeout(() => showOverlay('draw'), 500);
+            } else {
+                scorePlayer++;
+                scorePlayerEl.textContent = scorePlayer;
+                highlightWinCells(result.line);
+                setStatus('Você venceu?! 🏆', 'player-won');
+                setTimeout(() => showOverlay('player'), 900);
+            }
+        }
+
+        function aiMove() {
+            boardEl.classList.add('blocked');
+            showThinking();
+            setTimeout(() => {
+                const move = getBestMove(board);
+                if (move === -1) return;
+                board[move] = AI;
+                updateCells();
+                const result = checkWinner(board);
+                if (result) {
+                    endGame(result);
+                } else {
+                    boardEl.classList.remove('blocked');
+                    setStatus('Sua vez — jogue com X');
+                }
+            }, 500 + Math.random() * 300);
+        }
+
+        function resetBoard() {
+            board = Array(9).fill(null);
+            gameOver = false;
+            boardEl.classList.remove('blocked');
+            updateCells();
+            setStatus('Sua vez — jogue com X');
+        }
+
+        // Cell clicks
+        cells.forEach((cell, i) => {
+            cell.addEventListener('click', () => {
+                if (gameOver || board[i] || boardEl.classList.contains('blocked')) return;
+                board[i] = PLAYER;
+                updateCells();
+                const result = checkWinner(board);
+                if (result) {
+                    endGame(result);
+                } else {
+                    aiMove();
+                }
+            });
+        });
+
+        // Play Again in overlay
+        if (playAgainBtn) {
+            playAgainBtn.addEventListener('click', () => {
+                overlay.classList.add('hidden');
+
+                if (gameCount >= MAX_FREE_GAMES) {
+                    // Show paid retry footer
+                    tttActionFooter.classList.remove('hidden');
+                    tttActionMsg.textContent = `Você usou suas ${MAX_FREE_GAMES} tentativas gratuitas. A IA é imbatível — tente mais uma vez por R$ 3,00!`;
+                    overlay.classList.add('hidden');
+                    return;
+                }
+                resetBoard();
+            });
+        }
+
+        // Checkout button
+        if (tttBtnRetry) {
+            tttBtnRetry.addEventListener('click', async () => {
+                tttBtnRetry.innerHTML = `<i data-lucide="loader-2" class="spin-icon" style="width:20px;height:20px"></i><span>Processando...</span>`;
+                if (typeof lucide !== 'undefined') lucide.createIcons();
+                tttBtnRetry.classList.add('loading');
+                try {
+                    const res = await fetch('/api/checkout', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ price: 3.00, description: 'Jogo da Velha Premiado (R$ 3,00)' })
+                    });
+                    const data = await res.json();
+                    if (data.url) {
+                        window.location.href = data.url;
+                    } else throw new Error();
+                } catch {
+                    alert('Erro ao conectar com pagamento. Tente novamente.');
+                    tttBtnRetry.innerHTML = `<i data-lucide="refresh-cw" style="width:20px;height:20px"></i><span>Tentar Novamente — R$ 3,00</span><i data-lucide="arrow-right"></i>`;
+                    if (typeof lucide !== 'undefined') lucide.createIcons();
+                    tttBtnRetry.classList.remove('loading');
+                }
+            });
+        }
+
+        // Start!
+        resetBoard();
+    }
+
 
     // ===== FETCH RESULT =====
     async function fetchScratchResult() {
