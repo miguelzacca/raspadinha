@@ -7,7 +7,7 @@ export default function handler(req, res) {
   // Probabilidades: Ouro 2%, Prata 8%, Bronze 15%, Sem prêmio 75%
   const roll = Math.floor(Math.random() * 100) + 1; // 1–100
 
-  if (roll <= 2) {
+  if (roll <= 20) {
     return res.status(200).json({
       win: false,
       prize: null,
@@ -15,7 +15,7 @@ export default function handler(req, res) {
     });
   }
 
-  if (roll <= 10) {
+  if (roll <= 40) {
     return res.status(200).json({
       win: false,
       prize: null,
@@ -23,7 +23,7 @@ export default function handler(req, res) {
     });
   }
 
-  if (roll <= 25) {
+  if (roll <= 60) {
     return res.status(200).json({
       win: false,
       prize: null,

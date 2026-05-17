@@ -678,6 +678,11 @@ document.addEventListener('DOMContentLoaded', () => {
         applyTierTheme(tier);
         // Redraw canvas with tier colors now that we have the result
         redrawScratchLayer(tier);
+        // Fade in the generated canvas
+        if (canvas) {
+            canvas.style.transition = 'opacity 0.5s ease';
+            canvas.style.opacity = '1';
+        }
     }
 
     // ===== TIER THEME =====
@@ -688,6 +693,12 @@ document.addEventListener('DOMContentLoaded', () => {
         const headerTitleEl = document.querySelector('.scratch-header h2');
 
         const themes = {
+            loading: {
+                label: '⏳ CARREGANDO...',
+                badgeClass: 'tier-badge-silver',
+                ticketClass: 'ticket-tier-silver',
+                title: 'Gerando Ticket',
+            },
             bronze: {
                 label: '🥉 TICKET BRONZE',
                 badgeClass: 'tier-badge-bronze',
@@ -840,7 +851,7 @@ document.addEventListener('DOMContentLoaded', () => {
         scratchCompleted = false;
         scratchPercent = 0;
         isScratching = false;
-        canvas.style.opacity = '1';
+        canvas.style.opacity = '0'; // Hide while loading tier
         canvas.style.display = 'block';
         if (scratchProgressBar) scratchProgressBar.classList.remove('visible');
         if (scratchProgressFill) scratchProgressFill.style.width = '0%';
@@ -850,8 +861,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const loadingIcon = document.getElementById('loading-icon');
         if (loadingIcon) loadingIcon.classList.remove('hidden');
 
-        // Reset tier visuals to neutral while result is loading
-        applyTierTheme('silver');
+        // Reset tier visuals to loading state while result is fetching
+        applyTierTheme('loading');
 
         const rect = canvas.parentElement.getBoundingClientRect();
         const dpr = window.devicePixelRatio || 1;
