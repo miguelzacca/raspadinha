@@ -648,8 +648,166 @@ document.addEventListener('DOMContentLoaded', () => {
             const res = await fetch('/api/play');
             scratchResult = await res.json();
         } catch {
-            scratchResult = { win: false, prize: null };
+            scratchResult = { win: false, prize: null, tier: null };
         }
+        // Apply tier visuals once we know the tier
+        const tier = (scratchResult && scratchResult.tier) || 'silver';
+        applyTierTheme(tier);
+        // Redraw canvas with tier colors now that we have the result
+        redrawScratchLayer(tier);
+    }
+
+    // ===== TIER THEME =====
+    function applyTierTheme(tier) {
+        const badgeEl = document.getElementById('scratch-tier-badge');
+        const ticketEl = document.querySelector('.ticket');
+        const glowEl = document.querySelector('.ticket-border-glow');
+        const headerTitleEl = document.querySelector('.scratch-header h2');
+
+        const themes = {
+            bronze: {
+                label: '🥉 TICKET BRONZE',
+                badgeClass: 'tier-badge-bronze',
+                ticketClass: 'ticket-tier-bronze',
+                title: 'Ticket Bronze',
+            },
+            silver: {
+                label: '🥈 TICKET PRATA',
+                badgeClass: 'tier-badge-silver',
+                ticketClass: 'ticket-tier-silver',
+                title: 'Ticket Prata',
+            },
+            gold: {
+                label: '🥇 TICKET OURO',
+                badgeClass: 'tier-badge-gold',
+                ticketClass: 'ticket-tier-gold',
+                title: 'Ticket Ouro',
+            },
+        };
+
+        const t = themes[tier] || themes.silver;
+
+        if (badgeEl) {
+            badgeEl.textContent = t.label;
+            badgeEl.className = 'scratch-badge ' + t.badgeClass;
+        }
+        if (ticketEl) {
+            ticketEl.classList.remove('ticket-tier-bronze', 'ticket-tier-silver', 'ticket-tier-gold');
+            ticketEl.classList.add(t.ticketClass);
+        }
+        if (glowEl) {
+            glowEl.classList.remove('glow-bronze', 'glow-silver', 'glow-gold');
+            glowEl.classList.add('glow-' + tier);
+        }
+        if (headerTitleEl) {
+            headerTitleEl.textContent = t.title;
+        }
+    }
+
+    // ===== REDRAW CANVAS WITH TIER COLORS =====
+    let _lastTierW = 0, _lastTierH = 0, _lastTierDpr = 1;
+    function redrawScratchLayer(tier) {
+        if (!canvas || !ctx) return;
+        // Only redraw if scratch hasn't started yet
+        if (scratchPercent > 0 || scratchCompleted) return;
+
+        const w = _lastTierW;
+        const h = _lastTierH;
+        if (!w || !h) return;
+
+        // Save composite op, draw base, restore
+        const prevOp = ctx.globalCompositeOperation;
+        ctx.globalCompositeOperation = 'source-over';
+
+        ctx.fillStyle = '#1a1f2e';
+        ctx.fillRect(0, 0, w, h);
+
+        const tierGrads = {
+            bronze: [
+                [0,   '#5a3a1a'],
+                [0.2, '#a0673a'],
+                [0.4, '#7a4a25'],
+                [0.5, '#cd8b3a'],
+                [0.6, '#8b5e2a'],
+                [0.8, '#a0673a'],
+                [1,   '#5a3a1a'],
+            ],
+            silver: [
+                [0,   '#7a8599'],
+                [0.2, '#b0bec5'],
+                [0.4, '#8a9bae'],
+                [0.5, '#cfd8dc'],
+                [0.6, '#90a4ae'],
+                [0.8, '#b0bec5'],
+                [1,   '#78909c'],
+            ],
+            gold: [
+                [0,   '#7a5a00'],
+                [0.2, '#d4a817'],
+                [0.4, '#b8860b'],
+                [0.5, '#ffd700'],
+                [0.6, '#c9a800'],
+                [0.8, '#d4a817'],
+                [1,   '#7a5a00'],
+            ],
+        };
+
+        const stops = tierGrads[tier] || tierGrads.silver;
+        const metalGrad = ctx.createLinearGradient(0, 0, w, h);
+        stops.forEach(([pos, color]) => metalGrad.addColorStop(pos, color));
+        ctx.fillStyle = metalGrad;
+        ctx.fillRect(0, 0, w, h);
+
+        // Brushed lines
+        ctx.strokeStyle = 'rgba(255,255,255,0.05)';
+        ctx.lineWidth = 1;
+        for (let y = 0; y < h; y += 2) {
+            ctx.beginPath();
+            ctx.moveTo(0, y + Math.random() * 1);
+            ctx.lineTo(w, y + Math.random() * 1);
+            ctx.stroke();
+        }
+
+        // Noise
+        ctx.fillStyle = 'rgba(0,0,0,0.02)';
+        for (let i = 0; i < w; i += 3) {
+            for (let j = 0; j < h; j += 3) {
+                if (Math.random() > 0.5) ctx.fillRect(i, j, 2, 2);
+            }
+        }
+
+        // Holographic stripe overlay
+        const holoColors = {
+            bronze: ['rgba(139,69,19,0.1)', 'rgba(205,133,63,0.08)', 'rgba(255,255,255,0.12)', 'rgba(160,82,45,0.08)', 'rgba(101,67,33,0.1)'],
+            silver: ['rgba(139,92,246,0.08)', 'rgba(245,158,11,0.06)', 'rgba(255,255,255,0.1)', 'rgba(217,70,239,0.06)', 'rgba(59,130,246,0.08)'],
+            gold: ['rgba(255,200,0,0.1)', 'rgba(255,165,0,0.08)', 'rgba(255,255,255,0.15)', 'rgba(255,140,0,0.08)', 'rgba(218,165,32,0.1)'],
+        };
+        const hc = holoColors[tier] || holoColors.silver;
+        const holoGrad = ctx.createLinearGradient(0, h * 0.3, w, h * 0.7);
+        holoGrad.addColorStop(0, hc[0]);
+        holoGrad.addColorStop(0.3, hc[1]);
+        holoGrad.addColorStop(0.5, hc[2]);
+        holoGrad.addColorStop(0.7, hc[3]);
+        holoGrad.addColorStop(1, hc[4]);
+        ctx.fillStyle = holoGrad;
+        ctx.fillRect(0, 0, w, h);
+
+        // Center text
+        const textColors = { bronze: 'rgba(255,220,150,0.85)', silver: 'rgba(255,255,255,0.7)', gold: 'rgba(255,240,100,0.9)' };
+        const subColors = { bronze: 'rgba(255,200,120,0.5)', silver: 'rgba(255,255,255,0.4)', gold: 'rgba(255,230,80,0.6)' };
+        ctx.fillStyle = textColors[tier] || textColors.silver;
+        ctx.font = '800 22px Outfit';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.shadowColor = 'rgba(0,0,0,0.4)';
+        ctx.shadowBlur = 6;
+        ctx.fillText('✦ RASPE AQUI ✦', w / 2, h / 2 - 10);
+        ctx.font = '400 13px Outfit';
+        ctx.fillStyle = subColors[tier] || subColors.silver;
+        ctx.shadowBlur = 0;
+        ctx.fillText('Deslize para revelar seu prêmio', w / 2, h / 2 + 18);
+
+        ctx.globalCompositeOperation = 'destination-out';
     }
 
     // ===== SCRATCH CARD ENGINE =====
@@ -669,10 +827,18 @@ document.addEventListener('DOMContentLoaded', () => {
         const loadingIcon = document.getElementById('loading-icon');
         if (loadingIcon) loadingIcon.classList.remove('hidden');
 
+        // Reset tier visuals to neutral while result is loading
+        applyTierTheme('silver');
+
         const rect = canvas.parentElement.getBoundingClientRect();
         const dpr = window.devicePixelRatio || 1;
         const w = rect.width;
         const h = rect.height;
+
+        // Store dimensions for redraw after tier arrives
+        _lastTierW = w;
+        _lastTierH = h;
+        _lastTierDpr = dpr;
 
         canvas.width = w * dpr;
         canvas.height = h * dpr;
@@ -688,64 +854,8 @@ document.addEventListener('DOMContentLoaded', () => {
             dustCanvas.style.height = `${h}px`;
         }
 
-        // === Draw Premium Metallic Surface ===
-        // Base dark layer
-        ctx.fillStyle = '#1a1f2e';
-        ctx.fillRect(0, 0, w, h);
-
-        // Metallic silver gradient
-        const metalGrad = ctx.createLinearGradient(0, 0, w, h);
-        metalGrad.addColorStop(0, '#7a8599');
-        metalGrad.addColorStop(0.2, '#b0bec5');
-        metalGrad.addColorStop(0.4, '#8a9bae');
-        metalGrad.addColorStop(0.5, '#cfd8dc');
-        metalGrad.addColorStop(0.6, '#90a4ae');
-        metalGrad.addColorStop(0.8, '#b0bec5');
-        metalGrad.addColorStop(1, '#78909c');
-        ctx.fillStyle = metalGrad;
-        ctx.fillRect(0, 0, w, h);
-
-        // Brushed metal texture
-        ctx.strokeStyle = 'rgba(255,255,255,0.04)';
-        ctx.lineWidth = 1;
-        for (let y = 0; y < h; y += 2) {
-            ctx.beginPath();
-            ctx.moveTo(0, y + Math.random() * 1);
-            ctx.lineTo(w, y + Math.random() * 1);
-            ctx.stroke();
-        }
-
-        // Subtle noise
-        ctx.fillStyle = 'rgba(0,0,0,0.02)';
-        for (let i = 0; i < w; i += 3) {
-            for (let j = 0; j < h; j += 3) {
-                if (Math.random() > 0.5) ctx.fillRect(i, j, 2, 2);
-            }
-        }
-
-        // Holographic stripe
-        const holoGrad = ctx.createLinearGradient(0, h * 0.3, w, h * 0.7);
-        holoGrad.addColorStop(0, 'rgba(139,92,246,0.08)');
-        holoGrad.addColorStop(0.3, 'rgba(245,158,11,0.06)');
-        holoGrad.addColorStop(0.5, 'rgba(255,255,255,0.1)');
-        holoGrad.addColorStop(0.7, 'rgba(217,70,239,0.06)');
-        holoGrad.addColorStop(1, 'rgba(59,130,246,0.08)');
-        ctx.fillStyle = holoGrad;
-        ctx.fillRect(0, 0, w, h);
-
-        // Center text
-        ctx.fillStyle = 'rgba(255,255,255,0.7)';
-        ctx.font = '800 22px Outfit';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.shadowColor = 'rgba(0,0,0,0.3)';
-        ctx.shadowBlur = 6;
-        ctx.fillText('✦ RASPE AQUI ✦', w / 2, h / 2 - 10);
-
-        ctx.font = '400 13px Outfit';
-        ctx.fillStyle = 'rgba(255,255,255,0.4)';
-        ctx.shadowBlur = 0;
-        ctx.fillText('Deslize para revelar seu prêmio', w / 2, h / 2 + 18);
+        // Draw default silver surface (will be redrawn once tier arrives)
+        redrawScratchLayer('silver');
 
         // Setup eraser
         ctx.globalCompositeOperation = 'destination-out';
@@ -931,7 +1041,14 @@ document.addEventListener('DOMContentLoaded', () => {
         canvas.style.transition = 'opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1)';
         canvas.style.opacity = '0';
 
-        // Big burst of particles
+        // Tier-colored burst particles
+        const tier = (scratchResult && scratchResult.tier) || 'silver';
+        const tierBurstColors = {
+            bronze: ['#cd8b3a', '#e8a87c'],
+            silver: ['#cfd8dc', '#b0bec5'],
+            gold: ['#ffd700', '#ff8c00'],
+        };
+        const burstColors = tierBurstColors[tier] || ['#ffd700', '#b0bec5'];
         const cx = w / 2, cy = h / 2;
         for (let i = 0; i < 30; i++) {
             dustParticles.push({
@@ -941,7 +1058,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 vy: (Math.random() - 0.5) * 12 - 3,
                 life: 1 + Math.random(),
                 size: Math.random() * 5 + 2,
-                color: Math.random() > 0.5 ? '#ffd700' : '#b0bec5',
+                color: burstColors[Math.floor(Math.random() * burstColors.length)],
                 type: 'spark',
                 rotation: 0,
                 rotSpeed: (Math.random() - 0.5) * 0.5,
@@ -962,15 +1079,47 @@ document.addEventListener('DOMContentLoaded', () => {
         if (loadingIcon) loadingIcon.classList.add('hidden');
         resultTexts.classList.remove('hidden');
 
-        if (scratchResult && scratchResult.win) {
+        const tier = (scratchResult && scratchResult.tier) || null;
+
+        const tierMeta = {
+            bronze: {
+                icon: '🥉',
+                iconColor: '#e8a87c',
+                label: 'Prêmio Bronze',
+                msg: 'Parabéns! Você ganhou o prêmio Bronze!',
+                msgColor: '#e8a87c',
+                confettiColors: ['#cd8b3a', '#a0673a', '#e8a87c', '#ffffff', '#ffd700'],
+            },
+            silver: {
+                icon: '🥈',
+                iconColor: '#cfd8dc',
+                label: 'Prêmio Prata',
+                msg: 'Incrível! Você ganhou o prêmio Prata!',
+                msgColor: '#cfd8dc',
+                confettiColors: ['#cfd8dc', '#90a4ae', '#ffffff', '#8b5cf6', '#b0bec5'],
+            },
+            gold: {
+                icon: '🥇',
+                iconColor: '#ffd700',
+                label: 'Prêmio Ouro',
+                msg: '🔥 JACKPOT! Você ganhou o prêmio OURO!',
+                msgColor: '#ffd700',
+                confettiColors: ['#ffd700', '#ff8c00', '#fbbf24', '#ffffff', '#f43f5e'],
+            },
+        };
+
+        if (scratchResult && scratchResult.win && tier) {
+            const meta = tierMeta[tier] || tierMeta.silver;
             ticketResult.classList.add('win');
-            prizeStatus.innerText = "🎉 VENCEDOR!";
+            prizeStatus.innerText = `${meta.icon} VENCEDOR!`;
             prizeAmount.innerText = scratchResult.prize;
-            if (prizeLabel) prizeLabel.innerText = "Prêmio em dinheiro";
-            if (prizeIconContainer) prizeIconContainer.innerHTML = '<i data-lucide="trophy" class="prize-main-icon" style="width:48px;height:48px;color:#fbbf24"></i>';
-            actionMsg.innerText = "Parabéns! Você ganhou um prêmio incrível!";
-            actionMsg.style.color = "#4ade80";
-            fireEpicConfetti();
+            if (prizeLabel) prizeLabel.innerText = meta.label;
+            if (prizeIconContainer) {
+                prizeIconContainer.innerHTML = `<i data-lucide="trophy" class="prize-main-icon" style="width:48px;height:48px;color:${meta.iconColor}"></i>`;
+            }
+            actionMsg.innerText = meta.msg;
+            actionMsg.style.color = meta.msgColor;
+            fireEpicConfetti(meta.confettiColors);
         } else {
             ticketResult.classList.add('lose');
             prizeStatus.innerText = "QUE PENA";
@@ -986,15 +1135,15 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ===== CONFETTI =====
-    function fireEpicConfetti() {
+    function fireEpicConfetti(colors) {
         if (typeof confetti === 'undefined') return;
         const end = Date.now() + 4000;
-        const colors = ['#fbbf24', '#d946ef', '#8b5cf6', '#10b981', '#ffffff', '#f43f5e'];
+        const c = colors || ['#fbbf24', '#d946ef', '#8b5cf6', '#10b981', '#ffffff', '#f43f5e'];
 
         (function frame() {
-            confetti({ particleCount: 3, angle: 60, spread: 60, origin: { x: 0, y: 0.7 }, colors });
-            confetti({ particleCount: 3, angle: 120, spread: 60, origin: { x: 1, y: 0.7 }, colors });
-            confetti({ particleCount: 2, angle: 90, spread: 100, origin: { x: 0.5, y: 0.3 }, colors, gravity: 1.2 });
+            confetti({ particleCount: 3, angle: 60, spread: 60, origin: { x: 0, y: 0.7 }, colors: c });
+            confetti({ particleCount: 3, angle: 120, spread: 60, origin: { x: 1, y: 0.7 }, colors: c });
+            confetti({ particleCount: 2, angle: 90, spread: 100, origin: { x: 0.5, y: 0.3 }, colors: c, gravity: 1.2 });
             if (Date.now() < end) requestAnimationFrame(frame);
         })();
     }

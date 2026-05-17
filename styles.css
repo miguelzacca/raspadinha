@@ -710,7 +710,7 @@ body {
   align-items: center;
   gap: 6px;
   padding: 5px 14px;
-  font-size: 0.7rem;
+  font-size: 0.75rem;
   font-weight: 800;
   letter-spacing: 2px;
   background: linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(217, 70, 239, 0.15));
@@ -718,8 +718,65 @@ body {
   border-radius: 100px;
   color: var(--gold-light);
   margin-bottom: 0.75rem;
+  transition: background 0.5s, border-color 0.5s, color 0.5s;
 }
 
+/* ===== TIER BADGE VARIANTS ===== */
+.tier-badge-bronze {
+  background: linear-gradient(135deg, rgba(160, 103, 58, 0.25), rgba(101, 67, 33, 0.2));
+  border-color: rgba(205, 139, 58, 0.5);
+  color: #e8a87c;
+}
+
+.tier-badge-silver {
+  background: linear-gradient(135deg, rgba(176, 190, 197, 0.2), rgba(120, 144, 156, 0.15));
+  border-color: rgba(176, 190, 197, 0.4);
+  color: #cfd8dc;
+}
+
+.tier-badge-gold {
+  background: linear-gradient(135deg, rgba(255, 215, 0, 0.2), rgba(255, 140, 0, 0.15));
+  border-color: rgba(255, 215, 0, 0.5);
+  color: #ffd700;
+  box-shadow: 0 0 12px rgba(255, 215, 0, 0.2);
+}
+
+/* ===== TICKET TIER GLOW ===== */
+.ticket-border-glow.glow-bronze {
+  background: conic-gradient(from var(--angle), transparent, #cd8b3a 15%, #a0673a 30%, #7a4a25 45%, transparent 60%);
+  filter: blur(8px);
+  opacity: 0.85;
+}
+
+.ticket-border-glow.glow-silver {
+  background: conic-gradient(from var(--angle), transparent, #cfd8dc 15%, #90a4ae 30%, #607d8b 45%, transparent 60%);
+  filter: blur(8px);
+  opacity: 0.8;
+}
+
+.ticket-border-glow.glow-gold {
+  background: conic-gradient(from var(--angle), transparent, #ffd700 15%, #ff8c00 30%, #ffd700 45%, transparent 60%);
+  filter: blur(10px);
+  opacity: 0.95;
+}
+
+/* ===== TICKET TIER BORDER ===== */
+.ticket.ticket-tier-bronze {
+  border-color: rgba(205, 139, 58, 0.4);
+  box-shadow: inset 0 0 30px rgba(139, 69, 19, 0.1);
+}
+
+.ticket.ticket-tier-silver {
+  border-color: rgba(176, 190, 197, 0.3);
+  box-shadow: inset 0 0 30px rgba(120, 144, 156, 0.1);
+}
+
+.ticket.ticket-tier-gold {
+  border-color: rgba(255, 215, 0, 0.4);
+  box-shadow: inset 0 0 30px rgba(255, 215, 0, 0.08), 0 0 40px rgba(255, 200, 0, 0.1);
+}
+
+/* ===== SCRATCH HEADER TITLE PER TIER ===== */
 .scratch-header h2 {
   font-size: 2rem;
   font-weight: 900;
@@ -730,6 +787,7 @@ body {
   -webkit-text-fill-color: transparent;
   animation: gradientMove 4s linear infinite;
   margin-bottom: 0.4rem;
+  transition: background 0.5s;
 }
 
 .scratch-header p {
