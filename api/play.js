@@ -4,7 +4,7 @@ export default function handler(req, res) {
   }
 
   // Sistema de prêmios com tiers
-  const roll = Math.random() * 15;
+  const roll = 100;
 
   if (roll <= 2) {
     return res.status(200).json({
