@@ -50,7 +50,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const selectedGame = localStorage.getItem('selectedGame'); // 'scratch' | 'ttt' | null
 
     if (urlParams.has('paid')) {
-        // Returning from payment — go straight to game select
+        // Returning from payment — clear block state and go straight to game select
+        localStorage.removeItem('tttNeedsPay');
         setTimeout(() => startTransition(), 50);
     } else if (gameUnlocked && selectedGame === 'scratch') {
         // User had already chosen Raspadinha — restore directly
@@ -166,7 +167,11 @@ document.addEventListener('DOMContentLoaded', () => {
                         cpfError.innerHTML = "Você já resgatou sua chance grátis! <br>Redirecionando para jogar novamente por R$ 3,00...";
                         cpfError.style.display = 'block';
                         cpfError.style.color = '#fbbf24';
-                        resetCpfBtn();
+
+                        // Keep button in loading/blocked state during redirect
+                        btnValidateCpf.innerHTML = `<i data-lucide="loader-2" class="spin-icon" style="width:20px;height:20px"></i><span>Redirecionando...</span>`;
+                        if (typeof lucide !== 'undefined') lucide.createIcons();
+                        btnValidateCpf.classList.add('loading');
 
                         setTimeout(async () => {
                             try {
@@ -178,10 +183,13 @@ document.addEventListener('DOMContentLoaded', () => {
                                 const checkoutData = await checkoutRes.json();
                                 if (checkoutData.url) {
                                     window.location.href = checkoutData.url;
+                                } else {
+                                    throw new Error('no url');
                                 }
                             } catch {
                                 cpfError.innerHTML = "Erro ao redirecionar. Tente novamente.";
                                 cpfError.style.color = '#f87171';
+                                resetCpfBtn();
                             }
                         }, 2000);
                     } else {
@@ -452,6 +460,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 scoreAIEl.textContent = scoreAI;
                 highlightWinCells(result.line);
                 setStatus('IA venceu! 🤖', 'ai-won');
+                localStorage.setItem('tttNeedsPay', 'true');
                 // Lose → payment required
                 setTimeout(() => showLoseOverlay(), 900);
             } else if (result.winner === 'draw') {
@@ -569,6 +578,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Start!
         resetBoard();
+
+        if (localStorage.getItem('tttNeedsPay') === 'true') {
+            boardEl.classList.add('blocked');
+            gameOver = true;
+            setTimeout(() => showLoseOverlay(), 100);
+        }
     }
 
 
