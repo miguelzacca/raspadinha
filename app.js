@@ -50,9 +50,39 @@ document.addEventListener('DOMContentLoaded', () => {
     const selectedGame = localStorage.getItem('selectedGame'); // 'scratch' | 'ttt' | null
 
     if (urlParams.has('paid')) {
-        // Returning from payment — clear block state and go straight to game select
+        // Returning from payment — clear block states
         localStorage.removeItem('tttNeedsPay');
-        setTimeout(() => startTransition(), 50);
+        localStorage.setItem('gameUnlocked', 'true');
+        const paidGame = localStorage.getItem('selectedGame');
+
+        if (paidGame === 'scratch') {
+            // Go directly back to a fresh scratchcard
+            viewQuiz.classList.remove('active');
+            viewQuiz.style.display = 'none';
+            setTimeout(() => {
+                viewScratch.style.display = 'block';
+                void viewScratch.offsetWidth;
+                viewScratch.classList.add('active');
+                if (typeof lucide !== 'undefined') lucide.createIcons();
+                initScratchCard();
+                fetchScratchResult();
+            }, 50);
+        } else if (paidGame === 'ttt') {
+            // Go directly back to a fresh TTT game
+            viewQuiz.classList.remove('active');
+            viewQuiz.style.display = 'none';
+            const _vTTT = document.getElementById('step-ttt');
+            setTimeout(() => {
+                _vTTT.style.display = 'block';
+                void _vTTT.offsetWidth;
+                _vTTT.classList.add('active');
+                if (typeof lucide !== 'undefined') lucide.createIcons();
+                initTTT();
+            }, 50);
+        } else {
+            // No game chosen yet — go to game select via transition
+            setTimeout(() => startTransition(), 50);
+        }
     } else if (gameUnlocked && selectedGame === 'scratch') {
         // User had already chosen Raspadinha — restore directly
         viewQuiz.classList.remove('active');
