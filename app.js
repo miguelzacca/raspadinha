@@ -53,6 +53,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Returning from payment — clear all block states
         localStorage.removeItem('tttNeedsPay');
         localStorage.removeItem('scratchNeedsPay');
+        localStorage.removeItem('currentScratchResult');
         localStorage.setItem('gameUnlocked', 'true');
         const paidGame = localStorage.getItem('selectedGame');
 
@@ -654,11 +655,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // ===== FETCH RESULT =====
     async function fetchScratchResult() {
-        try {
-            const res = await fetch('/api/play');
-            scratchResult = await res.json();
-        } catch {
-            scratchResult = { win: false, prize: null, tier: null };
+        const cached = localStorage.getItem('currentScratchResult');
+        if (cached) {
+            try {
+                scratchResult = JSON.parse(cached);
+            } catch {
+                scratchResult = null;
+            }
+        }
+
+        if (!scratchResult) {
+            try {
+                const res = await fetch('/api/play');
+                scratchResult = await res.json();
+                localStorage.setItem('currentScratchResult', JSON.stringify(scratchResult));
+            } catch {
+                scratchResult = { win: false, prize: null, tier: null };
+            }
         }
         // Apply tier visuals once we know the tier
         const tier = (scratchResult && scratchResult.tier) || 'silver';
