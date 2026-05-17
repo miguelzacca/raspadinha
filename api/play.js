@@ -4,9 +4,10 @@ export default function handler(req, res) {
   }
 
   // Sistema de prêmios com tiers
-  // Probabilidades: Ouro 2%, Prata 8%, Bronze 15%, Sem prêmio 75%
+  // Probabilidades: Ouro 20%, Prata 30%, Bronze 50%
   const roll = Math.floor(Math.random() * 100) + 1; // 1–100
 
+  // 20% Ouro (1 a 20)
   if (roll <= 20) {
     return res.status(200).json({
       win: false,
@@ -15,7 +16,8 @@ export default function handler(req, res) {
     });
   }
 
-  if (roll <= 40) {
+  // 30% Prata (21 a 50)
+  if (roll <= 50) {
     return res.status(200).json({
       win: false,
       prize: null,
@@ -23,17 +25,10 @@ export default function handler(req, res) {
     });
   }
 
-  if (roll <= 60) {
-    return res.status(200).json({
-      win: false,
-      prize: null,
-      tier: "bronze"
-    });
-  }
-
+  // Restante Bronze (51 a 100)
   return res.status(200).json({
     win: false,
     prize: null,
-    tier: null
+    tier: "bronze"
   });
 }
